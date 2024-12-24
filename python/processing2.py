@@ -1,0 +1,1 @@
+print("szia retek")
