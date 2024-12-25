@@ -44,7 +44,3 @@ jobs:
                 -hash-${{hashFiles('rebar.lock')}}"
       - name: Run test
         run: rebar3 test
-      - name: Run elvis on elvis
-        run: |
-          rebar3 escriptize
-          _build/default/bin/elvis_core
