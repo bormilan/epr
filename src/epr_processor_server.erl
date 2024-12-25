@@ -1,20 +1,21 @@
 -module(epr_processor_server).
+
 -behaviour(gen_server).
 
 -export([start_link/2]).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2,
-         terminate/2]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).
 
 -type state() :: #{file_name => string(), aggregator_server => pid()}.
+
+-export_type([state/0]).
 
 %%% Client API
 start_link(FileName, AggServer) ->
     gen_server:start_link(?MODULE, {FileName, AggServer}, []).
 
--spec init(FileName :: string()) -> {ok, state()}.
+-spec init({FileName :: string(), AggServer :: pid()}) -> {ok, state()}.
 init({FileName, AggServer}) ->
-    {ok, #{file_name => FileName
-          , aggregator_server => AggServer}}.
+    {ok, #{file_name => FileName, aggregator_server => AggServer}}.
 
 handle_cast(run, #{file_name := FileName, aggregator_server := AggServer} = State) ->
     Command = "python3 " ++ FileName,
@@ -23,10 +24,11 @@ handle_cast(run, #{file_name := FileName, aggregator_server := AggServer} = Stat
 
     {noreply, State}.
 
-handle_call(_, _, _) -> ok.
+handle_call(_, _, State) ->
+    {reply, ok, State}.
 
 handle_info(Msg, State) ->
-    io:format("Unexpected message: ~p~n",[Msg]),
+    io:format("Unexpected message: ~p~n", [Msg]),
     {noreply, State}.
 
 terminate(normal, State) ->
@@ -50,4 +52,3 @@ loop(Port, FileName, AggServer) ->
             io:format("Python script finished~n"),
             ok
     end.
-
