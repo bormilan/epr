@@ -5,24 +5,14 @@
 init(Filenames) ->
     %TODO: I want to add some error handling and only
     %return those that are passed. Now we return all.
-    A = lists:map(fun(FileName) ->
-                epr_processor_server:start_link(FileName)
+    {_, AggServerPid} = epr_data_aggregator_server:start_link(),
+    lists:map(fun(FileName) ->
+                epr_processor_server:start_link(FileName, AggServerPid)
               end,
-              Filenames),
-    io:format(user, "~n----------------------------------~n", []),
-    io:format(user, "A: ~p~n", [A]),
-    io:format(user, "------------------------------------~n", []),
-    A.
+              Filenames).
 
 run(PidList) ->
     lists:map(fun({ok, Pid}) ->
-                spawn(gen_server, call, [Pid, run])
+                spawn(gen_server, cast, [Pid, run])
               end,
-              PidList),
-    receive
-        Cucc -> 
-            io:format(user, "~n----------------------------------~n", []),
-            io:format(user, "B: ~p~n", [Cucc]),
-            io:format(user, "------------------------------------~n", [])
-    end.
-
+              PidList).
