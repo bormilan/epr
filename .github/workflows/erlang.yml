@@ -42,5 +42,7 @@ jobs:
                 -otp-${{steps.setup-beam.outputs.otp-version}}\
                 -rebar3-${{steps.setup-beam.outputs.rebar3-version}}\
                 -hash-${{hashFiles('rebar.lock')}}"
+      - name: Run elvis
+        run: rebar3 lint
       - name: Run test
         run: rebar3 test
