@@ -10,7 +10,7 @@
 
 -export([all/0]).
 -export([init_per_suite/1, end_per_suite/1]).
--export([start_test/1]).
+-export([run_hello_world_from_python/1]).
 
 -elvis([{elvis_style, no_block_expressions, disable}]).
 
@@ -18,7 +18,7 @@
 
 -spec all() -> [atom()].
 all() ->
-    [start_test].
+    [run_hello_world_from_python].
 
 -spec init_per_suite(config()) -> config().
 init_per_suite(Config) ->
@@ -30,6 +30,6 @@ end_per_suite(Config) ->
     application:stop(epr),
     Config.
 
--spec start_test(Config :: config()) -> {ok, ok}.
-start_test(_Config) ->
+-spec run_hello_world_from_python(Config :: config()) -> ok.
+run_hello_world_from_python(_Config) ->
     ok.

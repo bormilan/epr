@@ -3,7 +3,7 @@
 -behaviour(gen_server).
 
 -export([start_link/2]).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).
+-export([init/1, handle_call/3, handle_cast/2, terminate/2]).
 
 -type state() :: #{file_name => string(), aggregator_server => pid()}.
 
@@ -20,35 +20,19 @@ init({FileName, AggServer}) ->
 handle_cast(run, #{file_name := FileName, aggregator_server := AggServer} = State) ->
     Command = "python3 " ++ FileName,
     Port = open_port({spawn, Command}, [binary, exit_status]),
-    loop(Port, FileName, AggServer),
 
-    {noreply, State}.
+    receive
+        {Port, {data, Data}} ->
+            gen_server:cast(AggServer, {add_data, FileName, Data})
+    end,
+
+    {noreply, State};
+handle_cast(stop, State) ->
+    {stop, normal, State}.
 
 handle_call(_, _, State) ->
     {reply, ok, State}.
 
-handle_info(Msg, State) ->
-    io:format("Unexpected message: ~p~n", [Msg]),
-    {noreply, State}.
-
 terminate(normal, State) ->
     io:format(user, "Processor terminated with file name: ~p~n", [State]),
-    ok;
-terminate(Error, State) ->
-    io:format(user, "Error: ~p~n", [Error]),
-    io:format(user, "State: ~p~n", [State]),
     ok.
-
-%%%%%%%%%%%%%%%%%%%%%
-%%% Private functions
-%%%%%%%%%%%%%%%%%%%%%
-
-loop(Port, FileName, AggServer) ->
-    receive
-        {Port, {data, Data}} ->
-            gen_server:cast(AggServer, {add_data, FileName, Data}),
-            loop(Port, FileName, AggServer);
-        {Port, closed} ->
-            io:format("Python script finished~n"),
-            ok
-    end.
