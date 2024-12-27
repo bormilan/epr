@@ -1,1 +1,1 @@
-print("szia retek")
+print("szia sanyi")

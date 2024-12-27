@@ -1,1 +1,1 @@
-print("szia lajos")
+print("black")

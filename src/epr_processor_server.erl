@@ -9,6 +9,12 @@
 
 -export_type([state/0]).
 
+-ifdef(TEST).
+
+-export([process_data/1]).
+
+-endif.
+
 %%% Client API
 start_link(FileName, AggServer) ->
     gen_server:start_link(?MODULE, {FileName, AggServer}, []).
@@ -23,7 +29,8 @@ handle_cast(run, #{file_name := FileName, aggregator_server := AggServer} = Stat
 
     receive
         {Port, {data, Data}} ->
-            gen_server:cast(AggServer, {add_data, FileName, Data})
+            ProcessedData = process_data(Data),
+            gen_server:cast(AggServer, {add_data, FileName, ProcessedData})
     end,
 
     {noreply, State};
@@ -36,3 +43,10 @@ handle_call(_, _, State) ->
 terminate(normal, State) ->
     io:format(user, "Processor terminated with file name: ~p~n", [State]),
     ok.
+
+%%%%%%%%%%%%%%%%%%%%%
+%%% Private functions
+%%%%%%%%%%%%%%%%%%%%%
+
+process_data(Data) ->
+    string:trim(binary_to_list(Data)).

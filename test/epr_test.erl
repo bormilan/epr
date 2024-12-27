@@ -12,9 +12,13 @@ workflow_test() ->
     timer:sleep(1000),
     State = gen_server:call(Aggregator, get_state),
 
-    ?assertEqual(#{"test/epr_test_python_data/processing.py" => <<"szia lajos\n">>,
-                   "test/epr_test_python_data/processing2.py" => <<"szia retek\n">>},
+    ?assertEqual(#{"test/epr_test_python_data/processing.py" => "szia lajos",
+                   "test/epr_test_python_data/processing2.py" => "szia sanyi"},
                  State),
 
     epr:shutdown(Aggregator, Pids),
+    ok.
+
+windows_result_test() ->
+    ?assertEqual("szia lajos", epr_processor_server:process_data(<<"szia lajos\r\n">>)),
     ok.

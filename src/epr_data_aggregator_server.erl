@@ -18,7 +18,6 @@ init(Param) ->
 
 handle_cast({add_data, Id, Data}, State) ->
     NewState = State#{Id => Data},
-    io:format(user, "New State: ~p~n", [NewState]),
     {noreply, NewState};
 handle_cast(stop, State) ->
     {stop, normal, State}.
