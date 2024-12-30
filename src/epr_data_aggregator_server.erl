@@ -18,13 +18,13 @@ init(Param) ->
 
 handle_cast({add_data, Id, Data}, State) ->
     NewState = State#{Id => Data},
-    {noreply, NewState};
-handle_cast(stop, State) ->
-    {stop, normal, State}.
+    {noreply, NewState}.
 
 handle_call(get_state, _From, State) ->
-    {reply, State, State}.
+    {reply, State, State};
+handle_call(stop, _, State) ->
+    {stop, normal, ok, State}.
 
 terminate(normal, State) ->
-    io:format(user, "Processor terminated with state: ~p~n", [State]),
+    io:format(user, "Aggregator terminated with state: ~p~n", [State]),
     ok.

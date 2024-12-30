@@ -27,4 +27,4 @@ run(Pids) ->
 shutdown(AggServerPid, ProcessorPids) ->
     Pids = [AggServerPid | ProcessorPids],
     % gen_server:cast(AggServerPid, stop),
-    lists:map(fun(Pid) -> gen_server:cast(Pid, stop) end, Pids).
+    lists:map(fun(Pid) -> gen_server:call(Pid, stop) end, Pids).

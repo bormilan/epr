@@ -33,12 +33,10 @@ handle_cast(run, #{file_name := FileName, aggregator_server := AggServer} = Stat
             gen_server:cast(AggServer, {add_data, FileName, ProcessedData})
     end,
 
-    {noreply, State};
-handle_cast(stop, State) ->
-    {stop, normal, State}.
+    {noreply, State}.
 
-handle_call(_, _, State) ->
-    {reply, ok, State}.
+handle_call(stop, _, State) ->
+    {stop, normal, ok, State}.
 
 terminate(normal, State) ->
     io:format(user, "Processor terminated with file name: ~p~n", [State]),
